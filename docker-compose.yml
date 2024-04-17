@@ -1,0 +1,35 @@
+version: '3'
+services:
+
+  db:
+    image: postgres:16
+    volumes:
+      - ~/Docker/pgdev:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=nst
+      - POSTGRES_PASSWORD=pass
+    ports:
+      - "5432:5432"      
+
+  pgbouncer:
+    image: edoburu/pgbouncer
+    volumes:
+      - ~/pgbouncer-2/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini
+      # - ~/pgbouncer-2/userlist.txt:/etc/pgbouncer/userlist.txt
+    environment:
+      - DB_USER=nst
+      - DB_PASSWORD=pass
+      - DB_HOST=db
+      # - DB_NAME=test
+      # for postgres:14 and above
+      # - AUTH_TYPE=scram-sha-256
+      # - POOL_MODE=transaction
+      - ADMIN_USERS=postgres,dbuser
+    ports:
+      - "6432:6432"
+    depends_on:
+      - db
+
+volumes:
+  pg_data:
